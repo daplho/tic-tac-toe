@@ -48,6 +48,7 @@ import './index.css';
       super(props);
       this.state = {
         history: [{
+          location: Array(2).fill(null),
           squares: Array(9).fill(null),
         }],
         stepNumber: 0,
@@ -58,14 +59,20 @@ import './index.css';
     handleClick(i) {
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
+      const location = current.location.slice();
       const squares = current.squares.slice();
 
       if (calculateWinner(squares) || squares[i]) {
           return;
       }
+
+      location[0] = i % 3 + 1;
+      location[1] = Math.floor(i / 3) + 1;
+
       squares[i] = this.state.xIsNext ? 'X' : 'O';
       this.setState({
           history: history.concat([{
+            location: location,
             squares: squares,
           }]),
           stepNumber: history.length,
@@ -87,7 +94,7 @@ import './index.css';
 
       const moves = history.map((step, move) => {
         const desc = move ?
-          'Go to move #' + move :
+          'Go to move #' + move + ': (' + step.location[0] + ',' + step.location[1] + ')':
           'Go to game start';
         return (
           <li key={move}>
@@ -113,7 +120,7 @@ import './index.css';
           </div>
           <div className="game-info">
             <div>{status}</div>
-            <ol>{moves}</ol>
+            <ol>{moves.slice(0,this.state.stepNumber + 1)}</ol>
           </div>
         </div>
       );
